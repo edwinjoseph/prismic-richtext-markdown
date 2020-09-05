@@ -4,14 +4,16 @@
   "description": "A method that converts Prismic's rich text blob into a markdown string.",
   "main": "src/index.js",
   "scripts": {
+    "build": "parcel build src/index.js",
     "test": "jest",
     "coverage": "jest --coverage"
   },
-  "dependencies": {
-    "jest": "26.4.2"
-  },
   "devDependencies": {
-    "@babel/core": "7.2.0",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "babel-jest": "^26.3.0",
+    "jest": "^26.4.2",
+    "parcel": "^1.12.4",
     "parcel-bundler": "^1.6.1"
   }
 }
