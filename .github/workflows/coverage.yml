@@ -17,10 +17,9 @@ jobs:
       - name: Install modules
         run: yarn
         
-        
       - uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          test-command: "yarn coverage"
+          test-command: "yarn test"
 
