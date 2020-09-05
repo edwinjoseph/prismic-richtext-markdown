@@ -340,5 +340,32 @@ describe("index.js", () => {
         "# This is a heading\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit.\nInteger id cursus urna. Mauris non fermentum leo.\n\nInteger tristique, neque id tincidunt congue, massa diam congue libero, at blandit turpis neque a purus."
       );
     });
+    it("ignores spans that it doesn't handle", () => {
+      const unknownSpan = [
+        {
+          text: "This is a string",
+          type: "paragraph",
+          spans: [
+            {
+              start: 0,
+              end: 16,
+              type: "random"
+            }
+          ]
+        }
+      ];
+
+      expect(richTextToMarkdown(unknownSpan)).toBe("This is a string");
+    });
+    it("ignores types that it doesn't handle", () => {
+      const unknownType = [
+        {
+          type: "embed",
+          oembed: {}
+        }
+      ];
+
+      expect(richTextToMarkdown(unknownType)).toBe("");
+    });
   });
 });
