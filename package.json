@@ -4,7 +4,7 @@
   "description": "A method that converts Prismic's rich text blob into a markdown string.",
   "main": "src/index.js",
   "scripts": {
-    "tests": "jest",
+    "test": "jest",
     "coverage": "jest --coverage"
   },
   "dependencies": {
