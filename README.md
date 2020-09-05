@@ -17,6 +17,6 @@ This is a method that converts the data that comes from Prismic's Rich Text fiel
 - [ ] Embedded
 - [ ] Right to left
 
-### Confirmed markdown packages that with this
+### Confirmed markdown packages that work with this
 It is most likely that this method works with most markdown packages, however I have only tested this with:
 - [x] [markdown-it](https://www.npmjs.com/package/markdown-it)
