@@ -10,10 +10,10 @@ This is a method that converts the data that comes from Prismic's Rich Text fiel
 - [x] Images
 - [x] Link to web
 - [x] Link to media
+- [x] Link to document
 - [x] Ordered lists
 - [x] Unordered lists
 - [x] Preformated
-- [ ] Link to document
 - [ ] Embedded
 - [ ] Right to left
 
