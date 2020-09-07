@@ -39,6 +39,9 @@ const replaceBetween = (start, end, value, str) => {
   return str.substr(0, start) + value + str.substr(end);
 };
 
+const knownSpans = ['strong', 'em', 'hyperlink'];
+const knownLinks = ['web', 'image', 'document'];
+
 /**
  * converts an array of rich text spans into an array of markdown spans
  * @param {RichTextSpan[]} spans
@@ -51,6 +54,12 @@ const convertSpans = (spans) => {
 
   return spans
     .reduce((acc, { start, end, type, data }) => {
+      if (!knownSpans.includes(type)) {
+        console.log(
+          `Span type "${type}" is unknown. Returning text as a paragragh`
+        );
+        return acc;
+      }
       acc.push({
         type,
         index: start,
@@ -81,39 +90,47 @@ const convertSpans = (spans) => {
  * adds any tags or additional information that are in spans to the text
  * @param {string} text
  * @param {RichTextSpan[]} spans
+ * @param {function} linkResolver
  * @returns {string}
  */
-const convertString = (text, spans) =>
+const convertString = (text, spans, linkResolver) =>
   convertSpans(spans).reduce((acc, { index, type, data }) => {
     let tag = "";
 
-    switch (type) {
-      case "strong":
-        tag = "**";
-        break;
-      case "em":
-        tag = "*";
-        break;
-      case "hyperlink": {
-        if (data.type === "Link.web" || data.type === "Link.image") {
-          const length = data.end - data.start;
-          return replaceBetween(
-            data.start,
-            data.end,
-            `[${text.substr(data.start, length)}](${data.value.url})`,
-            text
-          );
-        }
-        console.log(
-          `Link type "${data.type}" is not supported. Returning texting as paragraph.`
-        );
+    if (type === 'strong') {
+      tag = "**";
+    }
+
+    if (type === 'em') {
+      tag = "*";
+    }
+
+    if (type === 'hyperlink') {
+      const dataType = data.type;
+      const [_, linkType] = dataType.split('.');
+      
+      if (!knownLinks.includes(linkType)) {
+        console.log(`Link type "${dataType}" is unknown. Returning texting as paragraph.`)
         return text;
       }
-      default:
-        console.log(
-          `Span type "${type}" is unknown. Returning text as a paragragh`
-        );
-        break;
+
+      const length = data.end - data.start;
+      let url = data.value.url;
+
+      if (dataType === 'Link.document') {
+        if (!linkResolver) {
+          console.log('Unable to resolve a document link as no link resolver method was passed in.');
+          return text;
+        }
+        url = linkResolver(data.value);
+      }
+
+      return replaceBetween(
+        data.start,
+        data.end,
+        `[${text.substr(data.start, length)}](${url})`,
+        text
+      );
     }
 
     return insert(tag, index, acc);
@@ -122,10 +139,11 @@ const convertString = (text, spans) =>
 /**
  * converts a rich text block into a markdown string
  * @param {RichTextBlock}
+ * @param {function} linkResolver
  * @returns {string}
  */
-const convertRichTextBlock = ({ type, text, spans, url, alt }) => {
-  const convertedText = convertString(text, spans);
+const convertRichTextBlock = ({ type, text, spans, url, alt }, linkResolver) => {
+  const convertedText = convertString(text, spans, linkResolver);
 
   switch (type) {
     case "heading1":
@@ -174,10 +192,11 @@ const convertRichTextBlock = ({ type, text, spans, url, alt }) => {
 /**
  * converts an array of Prismic rich text blocks into a single markdown string
  * @param {RichTextBlock[]} richText
+ * @param {function} linkResolver
  * @returns {string}
  */
-const richTextToMarkdown = (richText) => {
-  const markdownArray = richText.map(convertRichTextBlock);
+const richTextToMarkdown = (richText, linkResolver) => {
+  const markdownArray = richText.map(richTextBlock => convertRichTextBlock(richTextBlock, linkResolver));
   return markdownArray.join("\n\n");
 };
 
