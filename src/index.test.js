@@ -70,9 +70,7 @@ describe("index.js", () => {
       ];
 
       expect(richTextToMarkdown(image)).toBe("![](someurl)");
-      expect(richTextToMarkdown(imageWithAlt)).toBe(
-        "![an alternate string](someurl)"
-      );
+      expect(richTextToMarkdown(imageWithAlt)).toBe("![an alternate string](someurl)");
     });
     it("converts paragraphs with emphasis", () => {
       const bold = [
@@ -127,12 +125,12 @@ describe("index.js", () => {
           spans: [
             {
               start: 0,
-              end: 18,
+              end: 17,
               type: "strong"
             },
             {
               start: 19,
-              end: 39,
+              end: 38,
               type: "em"
             },
             {
@@ -164,21 +162,14 @@ describe("index.js", () => {
 
       expect(richTextToMarkdown(bold)).toBe("**This is a bold string**");
       expect(richTextToMarkdown(italic)).toBe("*This is an italic string*");
-      expect(richTextToMarkdown(boldItalic)).toBe(
-        "**This part is bold** *and this part is italic*"
-      );
-      expect(richTextToMarkdown(boldItalicBold)).toBe(
-        "**This part is bold,** *this part is italic,* **and now it is bold again**"
-      );
-      expect(richTextToMarkdown(boldAndItalic)).toBe(
-        "***This is both bold and italic***"
-      );
+      expect(richTextToMarkdown(boldItalic)).toBe("**This part is bold** *and this part is italic*");
+      expect(richTextToMarkdown(boldItalicBold)).toBe("**This part is bold**, *this part is italic*, **and now it is bold again**");
+      expect(richTextToMarkdown(boldAndItalic)).toBe("***This is both bold and italic***");
     });
     it("converts paragraphs with urls", () => {
       const url = [
         {
-          text:
-            "This is some text with a link to google, followed by more text",
+          text: "This is some text with a link to google, followed by more text",
           type: "paragraph",
           spans: [
             {
@@ -186,10 +177,8 @@ describe("index.js", () => {
               end: 39,
               type: "hyperlink",
               data: {
-                type: "Link.web",
-                value: {
-                  url: "https://google.com"
-                }
+                link_type: "Web",
+                url: "https://google.com"
               }
             }
           ]
@@ -205,11 +194,8 @@ describe("index.js", () => {
               end: 45,
               type: "hyperlink",
               data: {
-                type: "Link.image",
-                value: {
-                  url:
-                    "https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format"
-                }
+                link_type: "Media",
+                url: "https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format"
               }
             }
           ]
@@ -225,18 +211,14 @@ describe("index.js", () => {
               end: 45,
               type: "hyperlink",
               data: {
-                type: "Link.document",
-                value: {
-                  document: {
-                    id: "XuE3SRIAACEAYWIF",
-                    type: "product",
-                    tags: [],
-                    lang: "en-gb",
-                    slug: "product-1",
-                    uid: "product-1"
-                  },
-                  isBroken: false
-                }
+                link_type: "Document",
+                id: "XuE3SRIAACEAYWIF",
+                type: "product",
+                tags: [],
+                lang: "en-gb",
+                slug: "product-1",
+                uid: "product-1",
+                isBroken: false
               }
             }
           ]
@@ -251,6 +233,90 @@ describe("index.js", () => {
       );
       expect(richTextToMarkdown(documentUrl, ({ lang, type, uid }) => `/${lang}/${type}/${uid}`)).toBe(
         "This is some text [with a link to a document](/en-gb/product/product-1)"
+      );
+    });
+    it("converts paragraphs with urls and emphasis", () => {
+      const url = [
+        {
+          text: "This is some text with a link to google, followed by more text",
+          type: "paragraph",
+          spans: [
+            {
+              start: 18,
+              end: 39,
+              type: "strong"
+            },
+            {
+              start: 18,
+              end: 39,
+              type: "hyperlink",
+              data: {
+                link_type: "Web",
+                url: "https://google.com"
+              }
+            }
+          ]
+        }
+      ];
+      const imageUrl = [
+        {
+          text: "This is some text with a link to a media item",
+          type: "paragraph",
+          spans: [
+            {
+              start: 18,
+              end: 45,
+              type: "strong"
+            },
+            {
+              start: 18,
+              end: 45,
+              type: "hyperlink",
+              data: {
+                link_type: "Media",
+                url: "https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format"
+              }
+            }
+          ]
+        }
+      ];
+      const documentUrl = [
+        {
+          text: "This is some text with a link to a document",
+          type: "paragraph",
+          spans: [
+            {
+              start: 18,
+              end: 43,
+              type: "strong"
+            },
+            {
+              start: 18,
+              end: 43,
+              type: "hyperlink",
+              data: {
+                link_type: "Document",
+                id: "XuE3SRIAACEAYWIF",
+                type: "product",
+                tags: [],
+                lang: "en-gb",
+                slug: "product-1",
+                uid: "product-1",
+                isBroken: false
+              }
+            }
+          ]
+        }
+      ];
+
+      expect(richTextToMarkdown(url)).toBe(
+        "This is some text **[with a link to google](https://google.com)**, followed by more text"
+      );
+      expect(richTextToMarkdown(imageUrl)).toBe(
+        "This is some text **[with a link to a media item](https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format)**"
+      );
+      expect(richTextToMarkdown(documentUrl, ({ lang, type, uid }) => `/${lang}/${type}/${uid}`)).toBe(
+        "This is some text **[with a link to a document](/en-gb/product/product-1)**"
       );
     });
     it("converts preformtted text", () => {
@@ -351,27 +417,21 @@ describe("index.js", () => {
               end: 45,
               type: "hyperlink",
               data: {
-                type: "Link.document",
-                value: {
-                  document: {
-                    id: "XuE3SRIAACEAYWIF",
-                    type: "product",
-                    tags: [],
-                    lang: "en-gb",
-                    slug: "product-1",
-                    uid: "product-1"
-                  },
-                  isBroken: false
-                }
+                link_type: "Document",
+                id: "XuE3SRIAACEAYWIF",
+                type: "product",
+                tags: [],
+                lang: "en-gb",
+                slug: "product-1",
+                uid: "product-1",
+                isBroken: false
               }
             }
           ]
         }
       ];
 
-      expect(richTextToMarkdown(documentUrl)).toBe(
-        "This is some text with a link to a document"
-      );
+      expect(richTextToMarkdown(documentUrl)).toBe("This is some text with a link to a document");
     });
     it("ignores links that it doesn't recognise", () => {
       const unknownLink = [
@@ -384,8 +444,7 @@ describe("index.js", () => {
               end: 14,
               type: "hyperlink",
               data: {
-                type: "Link.video",
-                value: {}
+                link_type: "Video",
               }
             }
           ]

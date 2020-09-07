@@ -1,3 +1,4 @@
+import { mapKeys, camelCase } from 'lodash';
 import logger from './logger';
 
 /**
@@ -54,48 +55,69 @@ const replaceBetween = (start, end, value, str) => {
 };
 
 const knownSpans = ['strong', 'em', 'hyperlink'];
-const knownLinks = ['web', 'image', 'document'];
+const knownLinks = ['Web', 'Media', 'Document'];
 
 /**
  * converts an array of rich text spans into an array of markdown spans
  * @param {RichTextSpan[]} spans
  * @returns {MarkdownSpan[]}
  */
-const convertSpans = (spans) => {
+const convertSpans = (spans, linkResolver) => {
   if (!spans) {
     return [];
   }
 
   return spans
     .reduce((acc, { start, end, type, data }) => {
+      const remappedData = mapKeys(data, (_, key) => camelCase(key));
+
       if (!knownSpans.includes(type)) {
         logger.warn(`Span type "${type}" is unknown. Returning text as a paragragh`);
         return acc;
       }
-      acc.push({
-        type,
-        index: start,
-        data: {
-          start,
-          end,
-          ...data
+
+      if (type === 'hyperlink') {
+        if (!knownLinks.includes(remappedData.linkType)) {
+          logger.warn(`Link type "${remappedData.linkType}" is unknown. Returning texting as paragraph.`);
+          return acc;
         }
-      });
-      if (type !== "hyperlink") {
-        acc.push({
+        if (remappedData.linkType === 'Document') {
+          if (!linkResolver) {
+            logger.warn('Unable to resolve a document link as no link resolver method was passed in.');
+            return acc;
+          }
+        }
+      }
+
+      // Making sure that the next item is always inbetween the previous item.
+      // For example if the original array of spans is [ bold, italic ] then the 
+      // returned array should be [ bold.end, italic.end, italic.start, bold.start ]
+      const putIndex = acc.length / 2;
+      acc.splice(
+        putIndex, 
+        0, // delete count
+        {
           type,
           index: end,
           data: {
             start,
             end,
-            ...data
+            ...remappedData
           }
-        });
-      }
+        }, 
+        {
+          type,
+          index: start,
+          data: {
+            start,
+            end,
+            ...remappedData,
+          }
+        }
+      );
       return acc;
     }, [])
-    .sort((a, b) => a.index - b.index)
-    .reverse();
+    .sort((a, b) => b.index - a.index); // Ensure sort order is in highest index first
 };
 
 /**
@@ -106,7 +128,7 @@ const convertSpans = (spans) => {
  * @returns {string}
  */
 const convertString = (text, spans, linkResolver) =>
-  convertSpans(spans).reduce((acc, { index, type, data }) => {
+  convertSpans(spans, linkResolver).reduce((acc, { index, type, data }) => {
     let tag = "";
 
     if (type === 'strong') {
@@ -118,36 +140,20 @@ const convertString = (text, spans, linkResolver) =>
     }
 
     if (type === 'hyperlink') {
-      const dataType = data.type;
-      const [_, linkType] = dataType.split('.');
+      if (index === data.start) {
+        tag = "["
+      } else {
+        const linkType = data.linkType;
+        let url = data.url;
 
-      if (!knownLinks.includes(linkType)) {
-        logger.warn(`Link type "${dataType}" is unknown. Returning texting as paragraph.`)
-        return text;
-      }
-
-      const length = data.end - data.start;
-      let url = data.value.url;
-
-      if (dataType === 'Link.document') {
-        if (!linkResolver) {
-          logger.warn('Unable to resolve a document link as no link resolver method was passed in.');
-          return text;
+        if (linkType === 'Document') {
+          url = linkResolver(data);
         }
-        url = linkResolver({
-          ...data.value.document,
-          isBroken: data.value.isBroken,
-        });
+
+        tag = `](${url})`;
       }
-
-      return replaceBetween(
-        data.start,
-        data.end,
-        `[${text.substr(data.start, length)}](${url})`,
-        text
-      );
     }
-
+    
     return insert(tag, index, acc);
   }, text);
 
