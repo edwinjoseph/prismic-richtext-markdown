@@ -1,3 +1,5 @@
+import logger from './logger';
+
 /**
  * @typedef RichTextSpan
  * @property {number} start
@@ -55,9 +57,7 @@ const convertSpans = (spans) => {
   return spans
     .reduce((acc, { start, end, type, data }) => {
       if (!knownSpans.includes(type)) {
-        console.log(
-          `Span type "${type}" is unknown. Returning text as a paragragh`
-        );
+        logger.warn(`Span type "${type}" is unknown. Returning text as a paragragh`);
         return acc;
       }
       acc.push({
@@ -108,9 +108,9 @@ const convertString = (text, spans, linkResolver) =>
     if (type === 'hyperlink') {
       const dataType = data.type;
       const [_, linkType] = dataType.split('.');
-      
+
       if (!knownLinks.includes(linkType)) {
-        console.log(`Link type "${dataType}" is unknown. Returning texting as paragraph.`)
+        logger.warn(`Link type "${dataType}" is unknown. Returning texting as paragraph.`)
         return text;
       }
 
@@ -119,7 +119,7 @@ const convertString = (text, spans, linkResolver) =>
 
       if (dataType === 'Link.document') {
         if (!linkResolver) {
-          console.log('Unable to resolve a document link as no link resolver method was passed in.');
+          logger.warn('Unable to resolve a document link as no link resolver method was passed in.');
           return text;
         }
         url = linkResolver(data.value);
@@ -177,9 +177,7 @@ const convertRichTextBlock = ({ type, text, spans, url, alt }, linkResolver) => 
 
     default: {
       if (type !== "paragraph") {
-        console.log(
-          `Text type "${type}" is unknown. Returning text as a paragragh`
-        );
+        logger.warn(`Text type "${type}" is unknown. Returning text as a paragragh`);
       }
       if (type === "paragraph" && !text) {
         return "&nbsp;";
