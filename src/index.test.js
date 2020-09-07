@@ -229,11 +229,11 @@ describe("index.js", () => {
                 value: {
                   document: {
                     id: "XuE3SRIAACEAYWIF",
-                    type: "child",
+                    type: "product",
                     tags: [],
                     lang: "en-gb",
-                    slug: "where-are-you-book",
-                    uid: "where-are-you-book"
+                    slug: "product-1",
+                    uid: "product-1"
                   },
                   isBroken: false
                 }
@@ -249,8 +249,8 @@ describe("index.js", () => {
       expect(richTextToMarkdown(imageUrl)).toBe(
         "This is some text [with a link to a media item](https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format)"
       );
-      expect(richTextToMarkdown(documentUrl)).toBe(
-        "This is some text with a link to a document"
+      expect(richTextToMarkdown(documentUrl, ({ document: { lang, type, uid } }) => `/${lang}/${type}/${uid}`)).toBe(
+        "This is some text [with a link to a document](/en-gb/product/product-1)"
       );
     });
     it("converts preformtted text", () => {
@@ -340,7 +340,61 @@ describe("index.js", () => {
         "# This is a heading\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit.\nInteger id cursus urna. Mauris non fermentum leo.\n\nInteger tristique, neque id tincidunt congue, massa diam congue libero, at blandit turpis neque a purus."
       );
     });
-    it("ignores spans that it doesn't handle", () => {
+    it("ignores document links if a link resolver isn't passed in", () => {
+      const documentUrl = [
+        {
+          text: "This is some text with a link to a document",
+          type: "paragraph",
+          spans: [
+            {
+              start: 18,
+              end: 45,
+              type: "hyperlink",
+              data: {
+                type: "Link.document",
+                value: {
+                  document: {
+                    id: "XuE3SRIAACEAYWIF",
+                    type: "product",
+                    tags: [],
+                    lang: "en-gb",
+                    slug: "product-1",
+                    uid: "product-1"
+                  },
+                  isBroken: false
+                }
+              }
+            }
+          ]
+        }
+      ];
+
+      expect(richTextToMarkdown(documentUrl)).toBe(
+        "This is some text with a link to a document"
+      );
+    });
+    it("ignores links that it doesn't recognise", () => {
+      const unknownLink = [
+        {
+          text: "This is a link",
+          type: "paragraph",
+          spans: [
+            {
+              start: 0,
+              end: 14,
+              type: "hyperlink",
+              data: {
+                type: "Link.video",
+                value: {}
+              }
+            }
+          ]
+        }
+      ];
+
+      expect(richTextToMarkdown(unknownLink)).toBe("This is a link");
+    })
+    it("ignores spans that it doesn't recognise", () => {
       const unknownSpan = [
         {
           text: "This is a string",
@@ -357,7 +411,7 @@ describe("index.js", () => {
 
       expect(richTextToMarkdown(unknownSpan)).toBe("This is a string");
     });
-    it("ignores types that it doesn't handle", () => {
+    it("ignores types that it doesn't recognise", () => {
       const unknownType = [
         {
           type: "embed",
