@@ -249,7 +249,7 @@ describe("index.js", () => {
       expect(richTextToMarkdown(imageUrl)).toBe(
         "This is some text [with a link to a media item](https://images.prismic.io/slicemachine-blank/6b2bf485-aa12-44ef-8f06-dce6b91b9309_dancing.png?auto=compress,format)"
       );
-      expect(richTextToMarkdown(documentUrl, ({ document: { lang, type, uid } }) => `/${lang}/${type}/${uid}`)).toBe(
+      expect(richTextToMarkdown(documentUrl, ({ lang, type, uid }) => `/${lang}/${type}/${uid}`)).toBe(
         "This is some text [with a link to a document](/en-gb/product/product-1)"
       );
     });

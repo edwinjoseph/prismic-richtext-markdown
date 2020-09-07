@@ -16,6 +16,18 @@ import logger from './logger';
  * @typedef MarkdownSpan
  * @property {number} index
  * @property {string} type
+ * 
+ * @typedef Document
+ * @property {string} id
+ * @property {string} uid
+ * @property {string} type
+ * @property {string} lang
+ * @property {string[]} tags
+ * @property {boolean} isBroken
+ * 
+ * @callback LinkResolver
+ * @param {Document} doc
+ * @returns {string}
  */
 
 /**
@@ -90,7 +102,7 @@ const convertSpans = (spans) => {
  * adds any tags or additional information that are in spans to the text
  * @param {string} text
  * @param {RichTextSpan[]} spans
- * @param {function} linkResolver
+ * @param {LinkResolver} [linkResolver]
  * @returns {string}
  */
 const convertString = (text, spans, linkResolver) =>
@@ -122,7 +134,10 @@ const convertString = (text, spans, linkResolver) =>
           logger.warn('Unable to resolve a document link as no link resolver method was passed in.');
           return text;
         }
-        url = linkResolver(data.value);
+        url = linkResolver({
+          ...data.value.document,
+          isBroken: data.value.isBroken,
+        });
       }
 
       return replaceBetween(
@@ -139,7 +154,7 @@ const convertString = (text, spans, linkResolver) =>
 /**
  * converts a rich text block into a markdown string
  * @param {RichTextBlock}
- * @param {function} linkResolver
+ * @param {LinkResolver} [linkResolver]
  * @returns {string}
  */
 const convertRichTextBlock = ({ type, text, spans, url, alt }, linkResolver) => {
@@ -190,7 +205,7 @@ const convertRichTextBlock = ({ type, text, spans, url, alt }, linkResolver) => 
 /**
  * converts an array of Prismic rich text blocks into a single markdown string
  * @param {RichTextBlock[]} richText
- * @param {function} linkResolver
+ * @param {LinkResolver} [linkResolver]
  * @returns {string}
  */
 const richTextToMarkdown = (richText, linkResolver) => {
