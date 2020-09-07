@@ -42,18 +42,6 @@ const insert = (value, index, str) => {
   return str.substr(0, index) + value + str.substr(index);
 };
 
-/**
- * relaces any text between the start and end of string with the value
- * @param {number} start
- * @param {number} end
- * @param {string} value
- * @param {string} str
- * @returns {string}
- */
-const replaceBetween = (start, end, value, str) => {
-  return str.substr(0, start) + value + str.substr(end);
-};
-
 const knownSpans = ['strong', 'em', 'hyperlink'];
 const knownLinks = ['Web', 'Media', 'Document'];
 
@@ -224,6 +212,5 @@ export const _tests = {
   convertRichTextBlock,
   convertString,
   convertSpans,
-  insert,
-  replaceBetween
+  insert
 };
