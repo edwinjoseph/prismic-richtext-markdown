@@ -9,11 +9,13 @@
   },
   "source": "./src/index.js",
   "main": "./lib/index.js",
+  "exports": "./lib/index.js",
   "repository": "https://github.com/edwinjoseph/prismic-richtext-markdown",
   "scripts": {
     "build": "parcel build ./src/index.js --out-dir ./lib",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "prepublish": "yarn test && yarn build"
   },
   "targets": {
     "main": {
@@ -22,7 +24,7 @@
       "isLibrary": true
     }
   },
-  "exports": "./lib/index.js",
+  "files": [ "lib" ],
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
