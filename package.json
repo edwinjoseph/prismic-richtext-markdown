@@ -1,6 +1,6 @@
 {
   "name": "@edwinjoseph/prismic-richtext-markdown",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A method that converts Prismic's rich text blob into a markdown string.",
   "author": {
     "name": "Edwin Joseph",
