@@ -2,12 +2,27 @@
   "name": "@edwinjoseph/prismic-richtext-markdown",
   "version": "1.0.0",
   "description": "A method that converts Prismic's rich text blob into a markdown string.",
-  "main": "src/index.js",
+  "author": {
+    "name": "Edwin Joseph",
+    "email": "edwinj3829@googlemail.com",
+    "url": "https://github.com/edwinjoseph"
+  },
+  "source": "./src/index.js",
+  "main": "./lib/index.js",
+  "repository": "https://github.com/edwinjoseph/prismic-richtext-markdown",
   "scripts": {
-    "build": "parcel build src/index.js",
+    "build": "parcel build ./src/index.js --out-dir ./lib",
     "test": "jest",
     "coverage": "jest --coverage"
   },
+  "targets": {
+    "main": {
+      "context": "browser",
+      "outputFormat": "esmodule",
+      "isLibrary": true
+    }
+  },
+  "exports": "./lib/index.js",
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
@@ -20,5 +35,6 @@
   "dependencies": {
     "lodash": "^4.17.20",
     "pino": "^6.6.0"
-  }
+  },
+  "license": "MIT"
 }

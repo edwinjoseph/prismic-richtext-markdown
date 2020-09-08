@@ -1,5 +1,6 @@
-import { mapKeys, camelCase } from 'lodash';
-import logger from './logger';
+const mapKeys = require('lodash/mapKeys');
+const camelCase = require('lodash/camelCase');
+const logger = require('./logger');
 
 /**
  * @typedef RichTextSpan
@@ -207,8 +208,8 @@ const richTextToMarkdown = (richText, linkResolver) => {
   return markdownArray.join("\n\n");
 };
 
-export default richTextToMarkdown;
-export const _tests = {
+module.exports = richTextToMarkdown;
+module.exports._tests = {
   convertRichTextBlock,
   convertString,
   convertSpans,
