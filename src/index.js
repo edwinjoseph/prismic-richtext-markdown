@@ -178,18 +178,18 @@ const convertRichTextBlock = ({ type, text, spans, url, alt }, linkResolver) => 
     }
 
     case "o-list-item": {
-      return `1. ${text}`;
+      return `1. ${convertedText}`;
     }
 
     case "list-item": {
-      return `- ${text}`;
+      return `- ${convertedText}`;
     }
 
     default: {
       if (type !== "paragraph") {
         logger.warn(`Text type "${type}" is unknown. Returning text as a paragragh`);
       }
-      if (type === "paragraph" && !text) {
+      if (type === "paragraph" && !convertedText) {
         return "&nbsp;";
       }
       return convertedText;
