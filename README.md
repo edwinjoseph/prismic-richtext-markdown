@@ -1,8 +1,8 @@
 # Prismic RichText Markdown
 
-**NOTE: Thiis package only supports Prismic API V2, you may use this if you are using V1 but will need to remap the richtext blob being passed in although this is not advised.**
+**NOTE: This package only supports Prismic API V2, you may use this if you are using V1 but will need to remap the richtext blob being passed in. Although this is not advised.**
 
-This is a method that converts the data that comes from Prismic's Rich Text field into a markdown string.
+This is a method that converts the data that comes from Prismic's RichText field into a markdown string.
 
 ### Supported options
 
@@ -24,7 +24,6 @@ It is most likely that this method works with most markdown packages, however I 
 - [x] [markdown-it](https://www.npmjs.com/package/markdown-it)
 
 ## Usage
-
 ### Example Prismic document
 ```
 {
