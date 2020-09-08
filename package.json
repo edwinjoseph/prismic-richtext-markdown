@@ -15,7 +15,8 @@
     "build": "parcel build ./src/index.js --out-dir ./lib",
     "test": "jest",
     "coverage": "jest --coverage",
-    "prepublish": "yarn test && yarn build"
+    "prepublish": "yarn test && yarn build",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "targets": {
     "main": {
