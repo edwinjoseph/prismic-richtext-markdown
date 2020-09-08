@@ -1,4 +1,6 @@
 # Prismic RichText Markdown
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/edwinjoseph/prismic-richtext-markdown/CI?style=flat-square)
+![npm](https://img.shields.io/npm/v/@edwinjoseph/prismic-richtext-markdown?label=%40edwinjoseph%2Fprismic-richtext-markdown&style=flat-square)
 
 **NOTE: This package only supports Prismic API V2, you may use this if you are using V1 but will need to remap the richtext blob being passed in. Although this is not advised.**
 
